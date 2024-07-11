@@ -59,8 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
     selected.shuffle();
     List<Player> left = selected.sublist(0, selected.length ~/ 2);
     List<Player> right = selected.sublist(selected.length ~/ 2);
-    return Dialog(
-        child: Column(children: <Widget>[
+    return Column(children: <Widget>[
       ListView.builder(
         itemCount: left.length,
         itemBuilder: (context, index) {
@@ -77,7 +76,7 @@ class _MyHomePageState extends State<MyHomePage> {
           );
         },
       ),
-    ]));
+    ]);
   }
 
   void onChanged(bool? value, int index) {
@@ -88,81 +87,68 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        title: Text(widget.title),
-      ),
-      body: Center(
-        widthFactor: 300,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                TextField(
-                  controller: _nameController,
-                  decoration: const InputDecoration(
-                      hintText: 'Digite o nome do jogador',
-                      constraints: BoxConstraints(
-                        maxWidth: 300,
-                      )),
-                ),
-                ElevatedButton(
-                  onPressed: _addPlayer,
-                  child: Icon(
-                    Icons.add,
-                    size: 30,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                ),
-              ],
-            ),
-            Text(
-              'Jogadores adicionados: $_counter',
-            ),
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const ScrollPhysics(),
-              itemCount: _players.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                    title: Text(_players[index].name),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          onPressed: () {
-                            setState(() {
-                              _players.removeAt(index);
-                              _counter--;
-                            });
-                          },
-                          icon: const Icon(Icons.delete),
-                        ),
-                        Checkbox(
-                            value: _players[index].selected,
-                            onChanged: (value) => onChanged(value, index))
-                      ],
-                    ));
-              },
-            ),
-          ],
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          title: Text(widget.title),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        onPressed: () {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return generateTeams();
-            },
-          );
-        },
-        tooltip: 'Increment',
-        child: const Text("Gerar times"),
-      ),
-    );
+        body: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  TextField(
+                    controller: _nameController,
+                    decoration: const InputDecoration(
+                        hintText: 'Digite o nome do jogador',
+                        constraints: BoxConstraints(
+                          maxWidth: 300,
+                        )),
+                  ),
+                  ElevatedButton(
+                    onPressed: _addPlayer,
+                    child: Icon(
+                      Icons.add,
+                      size: 30,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                  ElevatedButton(
+                      onPressed: generateTeams,
+                      child: const Text('Gerar times'))
+                ],
+              ),
+              Text(
+                'Jogadores adicionados: $_counter',
+              ),
+              ListView.builder(
+                itemCount: _players.length,
+                shrinkWrap: true,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                      title: Text(_players[index].name),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              setState(() {
+                                _players.removeAt(index);
+                                _counter--;
+                              });
+                            },
+                            icon: const Icon(Icons.delete),
+                          ),
+                          Checkbox(
+                              value: _players[index].selected,
+                              onChanged: (value) => onChanged(value, index))
+                        ],
+                      ));
+                },
+              ),
+            ],
+          ),
+        ));
   }
 }
