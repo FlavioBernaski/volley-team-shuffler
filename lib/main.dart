@@ -38,7 +38,7 @@ class Player {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  int _selected = 0;
   final List<Player> _players = [];
   final _nameController = TextEditingController();
 
@@ -47,40 +47,57 @@ class _MyHomePageState extends State<MyHomePage> {
       var name = _nameController.text.trim();
       if (name.isNotEmpty && !_players.any((player) => player.name == name)) {
         _players.add(Player(name, false));
-        _counter++;
       }
       _nameController.clear();
     });
   }
 
-  Widget generateTeams() {
+  void generateTeams(BuildContext context) {
     List<Player> selected =
         _players.where((player) => player.selected).toList();
     selected.shuffle();
     List<Player> left = selected.sublist(0, selected.length ~/ 2);
     List<Player> right = selected.sublist(selected.length ~/ 2);
-    return Column(children: <Widget>[
-      ListView.builder(
-        itemCount: left.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(left[index].name),
-          );
-        },
-      ),
-      ListView.builder(
-        itemCount: right.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(right[index].name),
-          );
-        },
-      ),
-    ]);
+    showDialog<String>(
+      context: context,
+      builder: (BuildContext context) => Dialog.fullscreen(
+          child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+            ListView.builder(
+              itemCount: left.length,
+              shrinkWrap: true,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text(left[index].name),
+                );
+              },
+            ),
+            const Divider(),
+            ListView.builder(
+              itemCount: right.length,
+              shrinkWrap: true,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text(right[index].name),
+                );
+              },
+            ),
+            TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Fechar'))
+          ])),
+    );
   }
 
   void onChanged(bool? value, int index) {
     _players.elementAt(index).selected = value!;
+    if (value) {
+      _selected++;
+    } else {
+      _selected--;
+    }
     setState(() {});
   }
 
@@ -114,14 +131,17 @@ class _MyHomePageState extends State<MyHomePage> {
                       color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
-                  ElevatedButton(
-                      onPressed: generateTeams,
-                      child: const Text('Gerar times'))
                 ],
               ),
+              const Padding(padding: EdgeInsets.all(5)),
+              ElevatedButton(
+                  onPressed: () => generateTeams(context),
+                  child: const Text('Gerar times')),
+              const Padding(padding: EdgeInsets.all(5)),
               Text(
-                'Jogadores adicionados: $_counter',
+                'Jogadores selecionados: $_selected',
               ),
+              const Divider(),
               ListView.builder(
                 itemCount: _players.length,
                 shrinkWrap: true,
@@ -135,7 +155,6 @@ class _MyHomePageState extends State<MyHomePage> {
                             onPressed: () {
                               setState(() {
                                 _players.removeAt(index);
-                                _counter--;
                               });
                             },
                             icon: const Icon(Icons.delete),
